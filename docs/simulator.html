@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luminar — Live Workspace Experience</title>
+  <link rel="icon" type="image/png" href="./icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand-bg: #1d1d1d;
+      --brand-bg-deep: #151515;
+      --brand-accent: #e5bddf;
+      --brand-accent-soft: rgba(229, 189, 223, 0.16);
+      --border-hairline: rgba(255, 255, 255, 0.09);
+      --border-specular: rgba(229, 189, 223, 0.28);
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --status-emerald: #10b981;
+      --status-amber: #f59e0b;
+      --status-orange: #f97316;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--brand-bg);
+      background-image:
+        radial-gradient(ellipse 85% 55% at 50% -12%, rgba(229, 189, 223, 0.15) 0%, transparent 68%),
+        radial-gradient(circle at 85% 70%, rgba(229, 189, 223, 0.06) 0%, transparent 50%);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      -webkit-font-smoothing: antialiased;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Subtle Anodized Matte Grain */
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+      opacity: 0.026;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    }
+
+    .nav-wrapper {
+      position: sticky;
+      top: 18px;
+      z-index: 100;
+      display: flex;
+      justify-content: center;
+      padding: 0 24px;
+    }
+
+    .navbar {
+      width: 100%;
+      max-width: 1280px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px 0 20px;
+      background: rgba(29, 29, 29, 0.8);
+      backdrop-filter: blur(28px);
+      -webkit-backdrop-filter: blur(28px);
+      border: 1px solid var(--border-hairline);
+      border-top-color: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      color: var(--text-primary);
+    }
+
+    .brand img {
+      width: 28px;
+      height: 28px;
+      border-radius: 7px;
+    }
+
+    .brand-wordmark {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+    }
+
+    .brand-divider {
+      color: var(--text-muted);
+      font-weight: 300;
+    }
+
+    .brand-sub {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--brand-accent);
+    }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 12.5px;
+      font-weight: 500;
+      padding: 9px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border-hairline);
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      text-decoration: none;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .pill-btn:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: var(--border-specular);
+      transform: translateY(-1px);
+    }
+
+    .pill-btn-orchid {
+      background: linear-gradient(135deg, #ffffff 0%, #f5e2f2 45%, var(--brand-accent) 100%);
+      color: #151515;
+      border: none;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(229, 189, 223, 0.25);
+    }
+
+    .pill-btn-orchid:hover {
+      background: linear-gradient(135deg, #ffffff 0%, #faeff8 35%, #eccae7 100%);
+      color: #0e0e0e;
+    }
+
+    /* LUXURY BROWSER SHELL */
+    .browser-shell {
+      position: relative;
+      z-index: 2;
+      flex: 1;
+      max-width: 1280px;
+      width: calc(100% - 48px);
+      margin: 34px auto 40px;
+      border-radius: 28px;
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 100%);
+      backdrop-filter: blur(28px);
+      border: 1px solid var(--border-hairline);
+      border-top-color: var(--border-specular);
+      box-shadow: 0 36px 90px rgba(0, 0, 0, 0.55), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-height: 700px;
+    }
+
+    .tab-strip {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 20px 0;
+      background: rgba(20, 20, 20, 0.85);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .traffic-lights {
+      display: flex;
+      gap: 7px;
+      margin-right: 14px;
+      padding-bottom: 12px;
+    }
+
+    .tl-dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.14);
+    }
+
+    .browser-tab {
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 14px 14px 0 0;
+      background: transparent;
+      border: 1px solid transparent;
+      border-bottom: none;
+      color: var(--text-muted);
+      font-size: 12.5px;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .browser-tab.active {
+      background: var(--brand-bg);
+      color: var(--text-primary);
+      border-color: var(--border-hairline);
+      border-top-color: rgba(229, 189, 223, 0.3);
+    }
+
+    .omnibar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 10px 20px;
+      background: var(--brand-bg);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .address-field {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.28);
+      border: 1px solid var(--border-hairline);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-secondary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .viewport {
+      flex: 1;
+      position: relative;
+      background: var(--brand-bg);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #sim-bluelight {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 40;
+      mix-blend-mode: multiply;
+      background-color: rgba(255, 140, 60, 0);
+      transition: background-color 0.45s ease;
+    }
+
+    /* DROPDOWN POPUP REPLICA */
+    #popup-drawer {
+      position: absolute;
+      top: 14px;
+      right: 20px;
+      width: 320px;
+      background: var(--brand-bg);
+      border: 1px solid rgba(255, 255, 255, 0.14);
+      border-top-color: var(--border-specular);
+      border-radius: 22px;
+      padding: 20px;
+      z-index: 60;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.85);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      transform-origin: top right;
+    }
+
+    #popup-drawer.hidden {
+      opacity: 0;
+      transform: scale(0.95);
+      pointer-events: none;
+    }
+
+    .pane {
+      flex: 1;
+      display: none;
+      padding: 36px;
+    }
+
+    .pane.active {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .split-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 24px;
+      flex: 1;
+    }
+
+    @media (max-width: 920px) {
+      .split-grid { grid-template-columns: 1fr; }
+    }
+
+    .luxury-surface {
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.055) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border: 1px solid var(--border-hairline);
+      border-top-color: rgba(229, 189, 223, 0.24);
+      border-radius: 24px;
+      padding: 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .meet-notice {
+      background: rgba(229, 189, 223, 0.08);
+      border: 1px solid var(--border-specular);
+      border-radius: 18px;
+      padding: 16px 22px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .call-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+      flex: 1;
+    }
+
+    .call-tile {
+      background: rgba(255, 255, 255, 0.035);
+      border: 1px solid var(--border-hairline);
+      border-radius: 22px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 28px;
+    }
+
+    .initials {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      background: var(--brand-accent-soft);
+      border: 1px solid var(--border-specular);
+      color: var(--brand-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    /* DRAGGABLE STEALTH HUD */
+    #vp-hud {
+      position: absolute;
+      bottom: 24px;
+      right: 24px;
+      width: 88px;
+      height: 88px;
+      z-index: 55;
+      cursor: grab;
+    }
+
+    .vp-orb {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background: rgba(29, 29, 29, 0.92);
+      backdrop-filter: blur(24px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-top-color: rgba(255, 255, 255, 0.16);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      position: relative;
+    }
+
+    .vp-btn {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid #27272a;
+      background: var(--brand-bg);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .vp-btn.shield { top: -6px; right: -6px; }
+    .vp-btn.shield.active { background: var(--status-amber); color: #fff; border-color: #fbbf24; }
+
+    .vp-btn.sun { bottom: -6px; left: -6px; }
+    .vp-btn.sun.active { background: var(--status-orange); color: #fff; border-color: #fb923c; }
+
+    #vp-hijack {
+      position: absolute;
+      inset: 0;
+      z-index: 80;
+      background: rgba(29, 29, 29, 0.94);
+      backdrop-filter: blur(24px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.45s ease;
+    }
+
+    #vp-hijack.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    @keyframes pendulum {
+      0%, 100% { transform: translateX(-26vw); }
+      50% { transform: translateX(26vw); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="nav-wrapper">
+    <header class="navbar">
+      <a href="./index.html" class="brand">
+        <img src="./icon.png" alt="Luminar" />
+        <span class="brand-wordmark">Luminar</span>
+        <span class="brand-divider">/</span>
+        <span class="brand-sub">Workspace Experience</span>
+      </a>
+
+      <div class="actions">
+        <button class="pill-btn" id="btn-3s">Preview Recovery Transition (3s)</button>
+        <button class="pill-btn" id="btn-meet">Preview Meeting Guard</button>
+        <button class="pill-btn" id="btn-bl">Cycle Blue Light Filter</button>
+        <a href="./index.html" class="pill-btn">← Overview</a>
+        <a href="./downloads/luminar-chrome-extension.zip" download class="pill-btn pill-btn-orchid">Get Extension</a>
+      </div>
+    </header>
+  </div>
+
+  <div class="browser-shell">
+    <div class="tab-strip">
+      <div class="traffic-lights">
+        <span class="tl-dot"></span>
+        <span class="tl-dot"></span>
+        <span class="tl-dot"></span>
+      </div>
+      <button class="browser-tab active" data-tab="ide" data-url="https://workspace.luminar.app/deep-focus">
+        01 &nbsp;·&nbsp; Deep Work Session
+      </button>
+      <button class="browser-tab" data-tab="meet" data-url="https://meet.google.com/executive-sync">
+        02 &nbsp;·&nbsp; Executive Call (Auto-Meeting Guard)
+      </button>
+    </div>
+
+    <div class="omnibar">
+      <div class="address-field">
+        <span id="omni-url">https://workspace.luminar.app/deep-focus</span>
+        <span style="color: var(--brand-accent);">Luminar Stealth HUD Active</span>
+      </div>
+      <button class="pill-btn" id="toggle-popup" style="padding: 6px 14px;">
+        <span>Luminar Popup ▾</span>
+      </button>
+    </div>
+
+    <div class="viewport" id="viewport">
+      <div id="sim-bluelight"></div>
+
+      <!-- EXTENSION POPUP -->
+      <div id="popup-drawer">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+          <span style="font-size: 12.5px; font-weight: 700; letter-spacing: 0.14em; text-transform: uppercase;">Luminar</span>
+          <span id="popup-status" style="font-size: 11.5px; color: var(--status-emerald);">● Active</span>
+        </div>
+
+        <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 16px; padding: 22px; text-align: center; margin-bottom: 14px;">
+          <div id="popup-clock" style="font-family: 'JetBrains Mono', monospace; font-size: 42px; font-weight: 500;">19:45</div>
+          <div id="popup-sub" style="font-size: 10px; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: var(--text-secondary); margin-top: 8px;">
+            Deep Work Session
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-bottom: 14px;">
+          <button class="pill-btn pill-btn-orchid" id="popup-3s" style="flex: 1; justify-content: center;">Preview Break (3s)</button>
+          <button class="pill-btn" id="popup-reset">Reset 20m</button>
+        </div>
+
+        <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 12px; display: flex; justify-content: space-between; align-items: center; font-size: 11.5px; color: var(--text-secondary);">
+          <span>Blue Light Filter: <strong id="popup-bl-text" style="color: var(--text-primary);">Off</strong></span>
+          <button class="pill-btn" id="popup-bl-btn" style="padding: 4px 12px;">Cycle</button>
+        </div>
+      </div>
+
+      <!-- TAB 1: DEEP WORK ENVIRONMENT -->
+      <div class="pane active" id="pane-ide">
+        <div class="split-grid">
+          <div class="luxury-surface">
+            <div>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.18em; color: var(--brand-accent); text-transform: uppercase;">
+                01 / COGNITIVE ARCHITECTURE
+              </span>
+              <h2 style="font-size: 26px; font-weight: 600; letter-spacing: -0.025em; margin: 12px 0 14px;">
+                Designed to disappear while you work.
+              </h2>
+              <p style="font-size: 14.5px; color: var(--text-secondary); line-height: 1.65;">
+                During active focus intervals, Luminar reduces its footprint to a quiet 88-pixel timepiece in the corner of your viewport—giving you immediate access to circadian warmth filtration and meeting protection without breaking concentration.
+              </p>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 24px;">
+              <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-hairline); border-radius: 16px; padding: 16px;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--brand-accent);">18s</span>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px;">Distance Gaze</p>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-hairline); border-radius: 16px; padding: 16px;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--brand-accent);">18s</span>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px;">Dynamic Pursuit</p>
+              </div>
+              <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border-hairline); border-radius: 16px; padding: 16px;">
+                <span style="font-family: 'JetBrains Mono', monospace; font-size: 18px; color: var(--brand-accent);">20s</span>
+                <p style="font-size: 11.5px; color: var(--text-secondary); margin-top: 4px;">Tear-Film Blink</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="luxury-surface">
+            <div>
+              <span style="font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.18em; color: var(--brand-accent); text-transform: uppercase;">
+                02 / INTERACTIVE CONTROLS
+              </span>
+              <h2 style="font-size: 22px; font-weight: 600; margin: 12px 0 12px; letter-spacing: -0.02em;">
+                Experience the transition live.
+              </h2>
+              <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; font-size: 13.5px; color: var(--text-secondary); line-height: 1.6;">
+                <li><strong style="color: var(--text-primary);">Recovery Transition:</strong> Trigger a 3-second countdown below to experience the full-screen ocular recovery overlay.</li>
+                <li><strong style="color: var(--text-primary);">Automatic Call Guard:</strong> Switch to the <em>Executive Call</em> tab above to observe how Luminar pauses breaks on `meet.google.com`.</li>
+                <li><strong style="color: var(--text-primary);">Tactile Placement:</strong> Drag the floating Stealth HUD anywhere across the workspace.</li>
+              </ul>
+            </div>
+
+            <div style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px;">
+              <button class="pill-btn pill-btn-orchid" id="card-3s">Preview Recovery in 3s</button>
+              <button class="pill-btn" id="card-meet">Switch to Executive Call →</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 2: EXECUTIVE CALL -->
+      <div class="pane" id="pane-meet">
+        <div class="meet-notice">
+          <div>
+            <strong style="font-size: 13.5px; color: var(--brand-accent);">Meeting Mode Active &nbsp;·&nbsp; `meet.google.com`</strong>
+            <p style="font-size: 12.5px; color: var(--text-secondary); margin-top: 3px;">
+              Luminar automatically detected an active video call and deferred ocular recovery breaks.
+            </p>
+          </div>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--brand-accent); letter-spacing: 0.12em;">
+            HUD STATUS: MEET
+          </span>
+        </div>
+
+        <div class="call-grid">
+          <div class="call-tile">
+            <div class="initials">D</div>
+            <strong style="font-size: 14.5px; font-weight: 500;">Dominik (Presenting)</strong>
+            <span style="font-size: 12px; color: var(--brand-accent);">Active Speaker</span>
+          </div>
+          <div class="call-tile">
+            <div class="initials">SC</div>
+            <strong style="font-size: 14.5px; font-weight: 500;">Sarah Chen</strong>
+            <span style="font-size: 12px; color: var(--text-muted);">Design Lead</span>
+          </div>
+          <div class="call-tile">
+            <div class="initials">MV</div>
+            <strong style="font-size: 14.5px; font-weight: 500;">Marcus Vance</strong>
+            <span style="font-size: 12px; color: var(--text-muted);">VP Product</span>
+          </div>
+          <div class="call-tile">
+            <div class="initials">ER</div>
+            <strong style="font-size: 14.5px; font-weight: 500;">Elena Rostova</strong>
+            <span style="font-size: 12px; color: var(--text-muted);">Staff Architect</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEALTH HUD -->
+      <div id="vp-hud">
+        <div class="vp-orb">
+          <button class="vp-btn shield" id="hud-shield" title="Meeting Mode">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+            </svg>
+          </button>
+          <span id="hud-dot" style="width: 6px; height: 6px; border-radius: 50%; background: var(--brand-accent);"></span>
+          <button class="vp-btn sun" id="hud-sun" title="Blue Light Filter">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <circle cx="12" cy="12" r="4"></circle>
+              <path d="M12 2v2m0 16v2M4.93 4.93l1.41 1.41m11.32 11.32l1.41 1.41M2 12h2m16 0h2M4.93 19.07l1.41-1.41m11.32-11.32l1.41-1.41"></path>
+            </svg>
+          </button>
+          <span id="hud-clock" style="font-family: 'JetBrains Mono', monospace; font-size: 14.5px;">19:45</span>
+        </div>
+      </div>
+
+      <!-- FULL-VIEWPORT RECOVERY OVERLAY -->
+      <div id="vp-hijack">
+        <span style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--brand-accent); letter-spacing: 0.2em;">
+          OCULAR RECOVERY PROTOCOL
+        </span>
+        <h2 style="font-size: 24px; font-weight: 500; letter-spacing: -0.02em; text-align: center; max-width: 560px;">
+          Follow the orb smoothly with your eyes. Keep your head completely still.
+        </h2>
+        <div style="width: 100%; height: 130px; display: flex; align-items: center; justify-content: center;">
+          <div style="width: 46px; height: 46px; border-radius: 50%; background: var(--brand-accent); box-shadow: 0 0 40px rgba(229,189,223,1), 0 0 80px rgba(229,189,223,0.6); animation: pendulum 7s ease-in-out infinite;"></div>
+        </div>
+        <button class="pill-btn pill-btn-orchid" id="close-hijack">Complete Recovery Preview</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let rem = 19 * 60 + 45;
+    let meet = false;
+    let blIdx = 0;
+    const LEVELS = [
+      { label: "Off", alpha: 0 },
+      { label: "Low", alpha: 0.08 },
+      { label: "Mid", alpha: 0.16 },
+      { label: "High", alpha: 0.25 }
+    ];
+
+    function fmt(s) {
+      return `${Math.floor(s / 60).toString().padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
+    }
+
+    function render() {
+      const str = fmt(rem);
+      document.getElementById("popup-clock").textContent = str;
+      document.getElementById("hud-clock").textContent = meet ? "MEET" : str;
+
+      const shield = document.getElementById("hud-shield");
+      const dot = document.getElementById("hud-dot");
+      const sub = document.getElementById("popup-sub");
+
+      if (meet) {
+        shield.classList.add("active");
+        dot.style.background = "#f59e0b";
+        sub.textContent = "Meeting Guard Active";
+      } else if (rem <= 5) {
+        shield.classList.remove("active");
+        dot.style.background = "#f59e0b";
+        sub.textContent = `Recovery in ${rem}s`;
+      } else {
+        shield.classList.remove("active");
+        dot.style.background = "#e5bddf";
+        sub.textContent = "Deep Work Session";
+      }
+
+      const lvl = LEVELS[blIdx];
+      document.getElementById("sim-bluelight").style.backgroundColor = `rgba(255, 140, 60, ${lvl.alpha})`;
+      document.getElementById("popup-bl-text").textContent = lvl.label;
+      const sun = document.getElementById("hud-sun");
+      if (blIdx > 0) sun.classList.add("active");
+      else sun.classList.remove("active");
+    }
+
+    setInterval(() => {
+      if (rem > 0) {
+        rem--;
+        if (rem === 0) {
+          if (meet) rem = 60;
+          else {
+            document.getElementById("vp-hijack").classList.add("active");
+            rem = 20 * 60;
+          }
+        }
+        render();
+      }
+    }, 1000);
+
+    function switchTab(t) {
+      document.querySelectorAll(".browser-tab").forEach((b) => {
+        b.classList.toggle("active", b.dataset.tab === t);
+        if (b.dataset.tab === t) document.getElementById("omni-url").textContent = b.dataset.url;
+      });
+      ["ide", "meet"].forEach((id) => {
+        document.getElementById(`pane-${id}`).classList.toggle("active", id === t);
+      });
+      meet = t === "meet";
+      render();
+    }
+
+    document.querySelectorAll(".browser-tab").forEach((b) => {
+      b.addEventListener("click", () => switchTab(b.dataset.tab));
+    });
+
+    document.getElementById("btn-meet").addEventListener("click", () => switchTab("meet"));
+    document.getElementById("card-meet").addEventListener("click", () => switchTab("meet"));
+
+    function set3s() {
+      meet = false;
+      rem = 3;
+      render();
+    }
+    document.getElementById("btn-3s").addEventListener("click", set3s);
+    document.getElementById("popup-3s").addEventListener("click", set3s);
+    document.getElementById("card-3s").addEventListener("click", set3s);
+
+    document.getElementById("popup-reset").addEventListener("click", () => {
+      rem = 20 * 60;
+      render();
+    });
+
+    function cycleBL() {
+      blIdx = (blIdx + 1) % LEVELS.length;
+      render();
+    }
+    document.getElementById("btn-bl").addEventListener("click", cycleBL);
+    document.getElementById("popup-bl-btn").addEventListener("click", cycleBL);
+    document.getElementById("hud-sun").addEventListener("click", (e) => {
+      e.stopPropagation();
+      cycleBL();
+    });
+
+    document.getElementById("hud-shield").addEventListener("click", (e) => {
+      e.stopPropagation();
+      meet = !meet;
+      render();
+    });
+
+    document.getElementById("toggle-popup").addEventListener("click", () => {
+      document.getElementById("popup-drawer").classList.toggle("hidden");
+    });
+
+    document.getElementById("close-hijack").addEventListener("click", () => {
+      document.getElementById("vp-hijack").classList.remove("active");
+    });
+
+    const hud = document.getElementById("vp-hud");
+    const vp = document.getElementById("viewport");
+    let drag = false;
+    let off = { x: 0, y: 0 };
+
+    hud.addEventListener("mousedown", (e) => {
+      drag = true;
+      const r = hud.getBoundingClientRect();
+      off.x = e.clientX - r.left;
+      off.y = e.clientY - r.top;
+    });
+
+    window.addEventListener("mousemove", (e) => {
+      if (!drag) return;
+      const vr = vp.getBoundingClientRect();
+      const x = Math.min(Math.max(12, e.clientX - vr.left - off.x), vr.width - 100);
+      const y = Math.min(Math.max(12, e.clientY - vr.top - off.y), vr.height - 100);
+      hud.style.left = `${x}px`;
+      hud.style.top = `${y}px`;
+      hud.style.right = "auto";
+      hud.style.bottom = "auto";
+    });
+
+    window.addEventListener("mouseup", () => {
+      drag = false;
+    });
+  </script>
+</body>
+</html>

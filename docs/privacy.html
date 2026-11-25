@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Privacy Policy — Luminar</title>
+  <link rel="icon" type="image/png" href="./icon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --brand-bg: #1d1d1d;
+      --brand-accent: #e5bddf;
+      --border-hairline: rgba(255, 255, 255, 0.09);
+      --border-specular: rgba(229, 189, 223, 0.28);
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: var(--brand-bg);
+      background-image: radial-gradient(ellipse 80% 50% at 50% -15%, rgba(229, 189, 223, 0.15) 0%, transparent 70%);
+      color: var(--text-primary);
+      -webkit-font-smoothing: antialiased;
+      line-height: 1.7;
+      min-height: 100vh;
+      padding: 64px 20px;
+    }
+    .container {
+      max-width: 760px;
+      margin: 0 auto;
+      background: linear-gradient(165deg, rgba(255, 255, 255, 0.06) 0%, rgba(255, 255, 255, 0.02) 100%);
+      border: 1px solid var(--border-hairline);
+      border-top-color: var(--border-specular);
+      border-radius: 28px;
+      padding: 48px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, 0.45);
+      backdrop-filter: blur(24px);
+    }
+    .badge {
+      display: inline-block;
+      padding: 6px 14px;
+      border-radius: 999px;
+      background: rgba(229, 189, 223, 0.1);
+      border: 1px solid var(--border-specular);
+      color: var(--brand-accent);
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.03em;
+      margin-bottom: 8px;
+    }
+    h2 {
+      color: var(--brand-accent);
+      font-size: 14px;
+      font-weight: 600;
+      margin: 32px 0 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+    }
+    p, li { color: var(--text-secondary); font-size: 15px; margin-bottom: 10px; }
+    ul { padding-left: 20px; }
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(229, 189, 223, 0.1);
+      color: var(--brand-accent);
+      padding: 2px 7px;
+      border-radius: 6px;
+      font-size: 12.5px;
+    }
+    a { color: var(--brand-accent); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .pill-back {
+      margin-top: 32px;
+      display: inline-flex;
+      padding: 10px 20px;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      font-size: 13px;
+      font-weight: 500;
+      text-decoration: none;
+    }
+    .pill-back:hover {
+      border-color: var(--border-specular);
+      text-decoration: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <span class="badge">100% Local Execution</span>
+    <h1>Privacy Policy — Luminar</h1>
+    <p><strong>Effective Date:</strong> November 2026 &nbsp;·&nbsp; <strong>Author:</strong> Dominik (Pdomea)</p>
+
+    <h2>01 / Zero Data Collection</h2>
+    <p>Luminar operates strictly locally inside your browser. We do not collect, log, store on external servers, sell, or transmit any personal information, browsing history, page content, or user analytics.</p>
+
+    <h2>02 / Local Browser Storage</h2>
+    <p>Luminar uses Chrome's native <code>chrome.storage</code> API exclusively to persist your timer preferences and session statistics on your own device:</p>
+    <ul>
+      <li>Active timer state &amp; countdown timestamp (<code>luminar_engine_state</code>, <code>luminar_engine_endTime</code>)</li>
+      <li>Selected focus duration in minutes (<code>luminar_work_duration_minutes</code>)</li>
+      <li>Completed ocular recovery counter (<code>luminar_pause_count</code>)</li>
+      <li>Blue-light filter state &amp; warmth level (<code>luminar_bluelight_active</code>, <code>luminar_bluelight_intensity</code>)</li>
+      <li>Meeting guard status (<code>luminar_meeting_mode_active</code>)</li>
+    </ul>
+
+    <h2>03 / Permissions</h2>
+    <ul>
+      <li><code>storage</code>: Persists your focus timer settings and completed session count locally.</li>
+      <li><code>alarms</code>: Triggers deterministic background focus-to-recovery transitions in Manifest V3 service workers.</li>
+      <li><code>content_scripts (&lt;all_urls&gt;)</code>: Renders the draggable Stealth HUD, the warm Blue-Light Filter overlay, and the full-screen Ocular Recovery sequences, and locally checks if the active hostname is a video call (Meet, Zoom, Teams, Webex) so breaks never interrupt meetings.</li>
+    </ul>
+
+    <h2>04 / Contact</h2>
+    <p>For inquiries regarding this policy, contact <a href="mailto:domepesa.98@gmail.com">domepesa.98@gmail.com</a>.</p>
+
+    <a class="pill-back" href="./index.html">← Return to Luminar Overview</a>
+  </div>
+</body>
+</html>
